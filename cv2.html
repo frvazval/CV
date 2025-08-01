@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plantilla de Currículum Vitae</title>
+  <!-- Load required libraries for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Google Fonts for Poppins and Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* CSS Styles for the CV */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .cv-container {
+      max-width: 960px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      background-image: linear-gradient(to right, #2563eb, #1e3a8a);
+      color: #ffffff;
+      padding: 50px 40px;
+      text-align: center;
+      position: relative;
+    }
+    .header img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      border: 5px solid #ffffff;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin: 0;
+    }
+    .header p {
+      font-size: 1.6rem;
+      font-weight: 400;
+      opacity: 0.95;
+      margin: 0;
+    }
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 32px;
+      padding: 40px;
+    }
+    @media (min-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr 2fr;
+      }
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .card {
+      padding: 24px;
+      background-color: #f8fafc;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    .card h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #1f2937;
+      border-bottom: 3px solid #1e3a8a;
+      padding-bottom: 8px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h4 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 16px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+      color: #1e3a8a;
+    }
+    .text-icon {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #4b5563;
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+    .text-icon a {
+      color: #4b5563;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .text-icon a:hover {
+      color: #1e3a8a;
+      text-decoration: underline;
+    }
+    .main-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .section-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1f2937;
+      border-bottom: 3px solid #1e3a8a;
+      padding-bottom: 8px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .experience-item, .education-item {
+      margin-bottom: 20px;
+      padding: 20px;
+      background-color: #f8fafc;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s;
+    }
+    .experience-item:hover, .education-item:hover {
+      transform: translateY(-4px);
+    }
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .item-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+    .item-header p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin: 0;
+      text-align: right;
+    }
+    .item-company {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+    .item-description {
+      list-style-type: disc;
+      padding-left: 20px;
+      color: #4b5563;
+      font-size: 0.9rem;
+    }
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .skill-badge {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .skill-badge.technical {
+      background-color: #eff6ff;
+      color: #1e40af;
+    }
+    .skill-badge.soft {
+      background-color: #e0e7ff;
+      color: #4338ca;
+    }
+    .languages-list {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+    .language-item {
+      margin-bottom: 6px;
+    }
+    .pdf-button-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+    #downloadPdfBtn {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+      box-shadow: 0 4px 6px rgba(30, 58, 138, 0.3);
+    }
+    #downloadPdfBtn:hover {
+      background-color: #1c2e7a;
+    }
+    #downloadPdfBtn:active {
+        transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <!-- Container for the entire CV content -->
+  <div class="cv-container" id="cv-content">
+    <!-- Header Section -->
+    <header class="header">
+      <img id="cv-photo" src="" alt="Foto de perfil">
+      <h1 id="cv-name"></h1>
+      <p id="cv-title"></p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-content">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Contact Card -->
+        <div class="card">
+          <h3>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            Contacto
+          </h3>
+          <div id="cv-contact" class="space-y-3">
+            <div class="text-icon"><svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg><span id="cv-phone"></span></div>
+            <div class="text-icon"><svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><span id="cv-email"></span></div>
+            <div class="text-icon"><svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg><a id="cv-linkedin" href="" target="_blank"></a></div>
+            <div class="text-icon"><svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10h-20a10 10 0 0 1 10-10z"></path></svg><a id="cv-website" href="" target="_blank"></a></div>
+          </div>
+        </div>
+        <!-- Availability Card -->
+        <div class="card">
+          <h3>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Disponibilidad
+          </h3>
+          <p id="cv-availability" class="text-gray-700"></p>
+        </div>
+        <!-- Skills Card -->
+        <div class="card">
+          <h3>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+            Aptitudes
+          </h3>
+          <h4>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="2"></rect></svg>
+            Habilidades Técnicas
+          </h4>
+          <div id="cv-technical-skills" class="skills-list"></div>
+          <h4>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9l1.5-1.5 1.5 1.5 1.5-1.5 1.5 1.5"></path><path d="M14 15l1.5-1.5 1.5 1.5 1.5-1.5 1.5 1.5"></path><path d="M14 21l1.5-1.5 1.5 1.5 1.5-1.5 1.5 1.5"></path><path d="M12 12s-3-2-6-2-4 2-4 2v6h12z"></path><path d="M12 12v6"></path><path d="M18 12v6"></path></svg>
+            Habilidades Blandas
+          </h4>
+          <div id="cv-soft-skills" class="skills-list"></div>
+          <h4>
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22s-2 0-2-2V7s2-2 2-2h12s2 2 2 2v13s-2 2-2 2H5z"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg>
+            Idiomas
+          </h4>
+          <div id="cv-languages" class="languages-list"></div>
+        </div>
+      </aside>
+
+      <!-- Main Sections -->
+      <div class="main-sections">
+        <!-- Profile Section -->
+        <section>
+          <h2 class="section-title">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16"></path></svg>
+            Perfil Profesional
+          </h2>
+          <p id="cv-profile" class="text-gray-700"></p>
+        </section>
+
+        <!-- Experience Section -->
+        <section>
+          <h2 class="section-title">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>
+            Experiencia Laboral
+          </h2>
+          <div id="cv-experience"></div>
+        </section>
+
+        <!-- Education Section -->
+        <section>
+          <h2 class="section-title">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 22V10a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"></path><path d="M20 22V10a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18"></path><line x1="2" y1="22" x2="22" y2="22"></line></svg>
+            Estudios Realizados
+          </h2>
+          <div id="cv-education"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  
+  <div class="pdf-button-container">
+      <button id="downloadPdfBtn">Descargar como PDF</button>
+  </div>
+
+  <script>
+    // Data structure for the CV content. This is what you would pass from your Node.js EJS template.
+    const cvData = {
+      name: "Tu Nombre Completo",
+      title: "Tu Título Profesional",
+      photoUrl: "https://placehold.co/128x128/E5E7EB/4B5563?text=Foto",
+      contact: {
+        phone: "+34 6XX XXX XXX",
+        email: "tu.email@ejemplo.com",
+        linkedin: "Tu Perfil de LinkedIn",
+        linkedinUrl: "https://www.linkedin.com/in/tunombredeusuario",
+        website: "Tu Portafolio/Web",
+        websiteUrl: "https://www.tuportfolio.com",
+      },
+      profile: "Aquí, escribe un párrafo conciso y atractivo (2-4 líneas) que resuma quién eres, tus habilidades clave y tu objetivo profesional. Destaca lo que te hace un candidato valioso para el puesto que buscas.",
+      availability: "Inmediata",
+      experience: [
+        {
+          position: "Cargo/Puesto Desempeñado",
+          company: "Nombre de la Empresa",
+          location: "Ciudad, País",
+          period: "Mes Año de Inicio – Mes Año de Fin o \"Presente\"",
+          description: [
+            "Describe tus responsabilidades y logros principales. Usa verbos de acción y cuantifica los resultados siempre que sea posible. Ej: \"Gestioné campañas de marketing digital que aumentaron el tráfico web en un 20%.\"",
+            "Punto clave 2",
+            "Punto clave 3",
+          ],
+        },
+        {
+          position: "Cargo/Puesto Desempeñado",
+          company: "Nombre de la Empresa",
+          location: "Ciudad, País",
+          period: "Mes Año de Inicio – Mes Año de Fin",
+          description: [
+            "Describe tus responsabilidades y logros principales.",
+            "Punto clave 2",
+            "Punto clave 3",
+          ],
+        },
+      ],
+      education: [
+        {
+          degree: "Nombre del Grado/Título",
+          institution: "Nombre de la Institución Educativa",
+          location: "Ciudad, País",
+          period: "Mes Año de Inicio – Mes Año de Fin",
+          notes: "Notas o proyectos destacados (opcional)",
+        },
+        {
+          degree: "Nombre del Grado/Título",
+          institution: "Nombre de la Institución Educativa",
+          location: "Ciudad, País",
+          period: "Mes Año de Inicio – Mes Año de Fin",
+          notes: "Notas o proyectos destacados (opcional)",
+        },
+      ],
+      skills: {
+        technical: [
+          "Software de diseño: Photoshop, Figma",
+          "Lenguajes de programación: Python, JavaScript",
+          "Herramientas de gestión de proyectos: Trello, Jira",
+          "Bases de datos: SQL, MongoDB",
+        ],
+        soft: [
+          "Comunicación efectiva",
+          "Resolución de problemas",
+          "Trabajo en equipo",
+          "Adaptabilidad",
+        ],
+        languages: [
+          { name: "Español", level: "Nativo/Bilingüe" },
+          { name: "Inglés", level: "B2 - Avanzado" },
+        ],
+      },
+    };
+
+    // DOMContentLoaded event listener to ensure the page is fully loaded before running script
+    document.addEventListener('DOMContentLoaded', () => {
+      // Function to render the CV content from the cvData object
+      function renderCV() {
+        // Render Header
+        document.getElementById('cv-photo').src = cvData.photoUrl;
+        document.getElementById('cv-name').textContent = cvData.name;
+        document.getElementById('cv-title').textContent = cvData.title;
+
+        // Render Contact Info
+        document.getElementById('cv-phone').textContent = cvData.contact.phone;
+        document.getElementById('cv-email').textContent = cvData.contact.email;
+        document.getElementById('cv-linkedin').textContent = cvData.contact.linkedin;
+        document.getElementById('cv-linkedin').href = cvData.contact.linkedinUrl;
+        document.getElementById('cv-website').textContent = cvData.contact.website;
+        document.getElementById('cv-website').href = cvData.contact.websiteUrl;
+        
+        // Render Profile
+        document.getElementById('cv-profile').textContent = cvData.profile;
+
+        // Render Availability
+        document.getElementById('cv-availability').textContent = cvData.availability;
+
+        // Render Experience
+        const experienceContainer = document.getElementById('cv-experience');
+        experienceContainer.innerHTML = '';
+        cvData.experience.forEach(item => {
+          const itemHtml = `
+            <div class="experience-item">
+              <div class="item-header">
+                <div>
+                  <h3>${item.position}</h3>
+                  <p class="item-company">${item.company}</p>
+                </div>
+                <div>
+                  <p>${item.period}</p>
+                  <p>${item.location}</p>
+                </div>
+              </div>
+              <ul class="item-description">
+                ${item.description.map(point => `<li>${point}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+          experienceContainer.innerHTML += itemHtml;
+        });
+
+        // Render Education
+        const educationContainer = document.getElementById('cv-education');
+        educationContainer.innerHTML = '';
+        cvData.education.forEach(item => {
+          const itemHtml = `
+            <div class="education-item">
+              <div class="item-header">
+                <div>
+                  <h3>${item.degree}</h3>
+                  <p class="item-company">${item.institution}</p>
+                </div>
+                <div>
+                  <p>${item.period}</p>
+                  <p>${item.location}</p>
+                </div>
+              </div>
+              ${item.notes ? `<p class="item-description">${item.notes}</p>` : ''}
+            </div>
+          `;
+          educationContainer.innerHTML += itemHtml;
+        });
+
+        // Render Skills
+        const technicalSkillsContainer = document.getElementById('cv-technical-skills');
+        technicalSkillsContainer.innerHTML = cvData.skills.technical.map(skill => `<span class="skill-badge technical">${skill}</span>`).join('');
+        
+        const softSkillsContainer = document.getElementById('cv-soft-skills');
+        softSkillsContainer.innerHTML = cvData.skills.soft.map(skill => `<span class="skill-badge soft">${skill}</span>`).join('');
+        
+        const languagesContainer = document.getElementById('cv-languages');
+        languagesContainer.innerHTML = cvData.skills.languages.map(lang => `<div class="language-item"><span style="font-weight: bold;">${lang.name}:</span> ${lang.level}</div>`).join('');
+      }
+
+      // PDF generation logic
+      document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+        const element = document.getElementById('cv-content');
+        html2canvas(element, { scale: 2 }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+          const imgWidth = 210; 
+          const pageHeight = 295;
+          const imgHeight = canvas.height * imgWidth / canvas.width;
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          pdf.save('curriculum-vitae.pdf');
+        });
+      });
+      
+      // Initial render of the CV
+      renderCV();
+    });
+  </script>
+</body>
+</html>
